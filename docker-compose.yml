@@ -11,9 +11,6 @@ services:
         environment:
             DISPLAY: ${X_DISPLAY}
         image: arris/vscode
-        tty: true
-        stdin_open: true
-        network_mode: host 
         ports: 
             - "3000:3000"
         userns_mode: "host"

@@ -32,7 +32,7 @@ clean:
 	docker rm $(CONTAINER_IDS)
 
 shell:
-	docker exec -it secql_ide_1 /bin/bash
+	docker exec -it docker_ide_1 /bin/bash
 
 status:
 	docker ps -a

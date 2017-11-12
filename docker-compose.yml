@@ -17,4 +17,4 @@ services:
         user: "${X_UID}:${X_GID}"
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - ~/Code/src/github.com/arrisray/secql:${CODE_DIR}
+            - ~/Code:${CODE_DIR}

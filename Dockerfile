@@ -12,6 +12,7 @@ ARG VERSION=1.9.2
 ARG OS=linux
 ARG ARCH=amd64
 ARG CODE_DIR=/opt/code
+ARG PROJECT_DIR=${CODE_DIR}/src/github.com/arrisray/secql
 
 # Envs
 ENV PATH="/usr/local/go/bin:${PATH}"
@@ -49,9 +50,17 @@ RUN sudo mkdir -p ${GOPATH}/.vscode/User \
         ${DATA_DIR} \
         /tmp \
     && wget -nc https://redirector.gvt1.com/edgedl/go/go${VERSION}.${OS}-${ARCH}.tar.gz \
+    && wget -nc https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 \
+        && cp dep-linux-amd64 /usr/local/go/bin/dep \
+        && chmod +x /usr/local/go/bin/dep \
 	&& tar -C /usr/local -xzf go${VERSION}.${OS}-${ARCH}.tar.gz \
     && code --install-extension lukehoban.Go --user-data-dir=${DATA_DIR} \
     && code --install-extension vscodevim.vim --user-data-dir=${DATA_DIR} 
+
+# Configure project
+WORKDIR ${PROJECT_DIR}
+COPY Gopkg.* ${PROJECT_DIR}/
+RUN dep ensure --vendor-only
 
 # Run
 CMD code --wait --user-data-dir=$DATA_DIR

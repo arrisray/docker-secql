@@ -6,13 +6,13 @@ ARG USER=developer
 ARG GROUP=dev
 ARG UID=1000
 ARG GID=1000
+ARG CODE_DIR=/opt/code
+ARG PROJECT_DIR=${CODE_DIR}/src/github.com/user/repo
 ARG USER_PWD=${USER}
 ARG ROOT_PWD=root
 ARG VERSION=1.9.2
 ARG OS=linux
 ARG ARCH=amd64
-ARG CODE_DIR=/opt/code
-ARG PROJECT_DIR=${CODE_DIR}/src/github.com/arrisray/secql
 
 # Envs
 ENV PATH="/usr/local/go/bin:${PATH}"

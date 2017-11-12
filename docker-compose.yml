@@ -8,6 +8,10 @@ services:
                 GROUP: ${X_GROUP}
                 UID: ${X_UID}
                 GID: ${X_GID}
+                USER_PWD: ${USER_PWD}
+                ROOT_PWD: ${ROOT_PWD}
+                CODE_DIR: ${CODE_DIR}
+                PROJECT_DIR: ${PROJECT_DIR}
         environment:
             DISPLAY: ${X_DISPLAY}
         image: arris/vscode

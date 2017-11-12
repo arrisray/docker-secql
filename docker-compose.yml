@@ -3,11 +3,21 @@ services:
     ide:
         build: 
             context: .
+            args:
+                USER: ${X_USER}
+                GROUP: ${X_GROUP}
+                UID: ${X_UID}
+                GID: ${X_GID}
         environment:
-            DISPLAY: ${HOST_IP}:0
+            DISPLAY: ${X_DISPLAY}
+        image: arris/vscode
         tty: true
         stdin_open: true
         network_mode: host 
+        ports: 
+            - "3000:3000"
+        userns_mode: "host"
+        user: "${X_UID}:${X_GID}"
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
-            - ~/Code/src/github.com/arrisray/secql:/opt/code
+            - ~/Code/src/github.com/arrisray/secql:${CODE_DIR}

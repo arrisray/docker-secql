@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 services:
     ide:
         build: 
@@ -8,17 +8,14 @@ services:
                 GROUP: ${X_GROUP}
                 UID: ${X_UID}
                 GID: ${X_GID}
+                GOPATH: ${X_GOPATH}
+                PROJECT_DIR: ${PROJECT_DIR}
+                PROJECT_NS: ${PROJECT_NS}
+                PROJECT_NAME: ${PROJECT_NAME}
                 USER_PWD: ${USER_PWD}
                 ROOT_PWD: ${ROOT_PWD}
-                CODE_DIR: ${CODE_DIR}
-                PROJECT_DIR: ${PROJECT_DIR}
-        environment:
-            DISPLAY: ${X_DISPLAY}
-        image: arris/vscode
+        image: arris/secql
         ports: 
             - "3000:3000"
-        userns_mode: "host"
-        user: "${X_UID}:${X_GID}"
         volumes:
-            - /tmp/.X11-unix:/tmp/.X11-unix
-            - ~/Code:${CODE_DIR}
+            - ${PROJECT_DIR}:/opt/code/src/${PROJECT_NS}

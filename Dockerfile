@@ -1,4 +1,4 @@
-FROM arris/vscode:latest
+FROM arris/dev:latest
 MAINTAINER Arris Ray <arris.ray@gmail.com>
 
 # Args
@@ -6,18 +6,19 @@ ARG USER=developer
 ARG GROUP=dev
 ARG UID=1000
 ARG GID=1000
-ARG CODE_DIR=/opt/code
-ARG PROJECT_DIR=${CODE_DIR}/src/github.com/user/repo
+ARG GOPATH=/opt/code
+ARG PROJECT_DIR=src/github.com/user/repo
+ARG PROJECT_NS=github.com/user/repo
+ARG PROJECT_NAME=repo
 ARG USER_PWD=${USER}
 ARG ROOT_PWD=root
 ARG VERSION=1.9.2
 ARG OS=linux
 ARG ARCH=amd64
 
-# Envs
-ENV PATH="/usr/local/go/bin:${PATH}"
-ENV GOPATH=${CODE_DIR}
-ENV DATA_DIR=${HOME}/.vscode
+# # Envs
+ENV GOPATH="${GOPATH}"
+ENV PATH="/usr/local/go/bin:${GOPATH}/bin:${PATH}"
 
 # Configure users
 # - Add non-privileged user
@@ -36,32 +37,31 @@ RUN id -u ${USER} || \
         && echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     )
 
-# Configure env
-USER ${USER}
-ENV HOME /home/${USER}
-WORKDIR ${HOME}
-
-# Configure VS Code
-COPY ./settings/settings.json ${DATA_DIR}/User
-RUN sudo mkdir -p ${GOPATH}/.vscode/User \
+# Configure Go
+RUN sudo mkdir -p ${GOPATH} ${GOPATH}/bin \
     && sudo chown -R ${USER}:${GROUP} \
         ${GOPATH} \
         /usr/local \
-        ${DATA_DIR} \
         /tmp \
     && wget -nc https://redirector.gvt1.com/edgedl/go/go${VERSION}.${OS}-${ARCH}.tar.gz \
+        && tar -C /usr/local -xzf go${VERSION}.${OS}-${ARCH}.tar.gz \
     && wget -nc https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 \
-        && cp dep-linux-amd64 /usr/local/go/bin/dep \
-        && chmod +x /usr/local/go/bin/dep \
-	&& tar -C /usr/local -xzf go${VERSION}.${OS}-${ARCH}.tar.gz \
-    && code --install-extension lukehoban.Go --user-data-dir=${DATA_DIR} \
-    && code --install-extension vscodevim.vim --user-data-dir=${DATA_DIR} 
+        && cp dep-linux-amd64 ${GOPATH}/bin/dep \
+        && chmod +x ${GOPATH}/bin/dep \
+    && cd ${GOPATH} \
+        && go get -u golang.org/x/tools/... \
+        && go get github.com/derekparker/delve/cmd/dlv && cd src/github.com/derekparker/delve && make install \
+    && sudo chown -R ${USER}:${GROUP} ${GOPATH}
+
+# Configure env
+USER ${USER}
+ENV HOME /home/${USER}
 
 # Configure project
-WORKDIR ${PROJECT_DIR}
-COPY Gopkg.* ${PROJECT_DIR}/
-RUN dep ensure --vendor-only
+WORKDIR ${GOPATH}/src/${PROJECT_NS}
+EXPOSE 2345 3000
 
 # Run
-CMD code --wait --user-data-dir=$DATA_DIR
+ADD config/supervisord.conf /etc/supervisord.conf
+CMD sudo /usr/bin/supervisord -c /etc/supervisord.conf
 

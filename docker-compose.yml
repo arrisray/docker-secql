@@ -17,5 +17,7 @@ services:
         image: arris/secql
         ports: 
             - "3000:3000"
+        security_opt:
+            - seccomp:unconfined
         volumes:
             - ${PROJECT_DIR}:/opt/code/src/${PROJECT_NS}

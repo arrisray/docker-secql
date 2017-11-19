@@ -13,6 +13,6 @@ type Handler struct {
 func NewHandler() (*Handler, error) {
 	h := &Handler{Mux: chi.NewRouter()}
 	h.Get("/", h.getHome)
-	h.Get("/company", h.getCompany)
+	h.Get("/company/{id}", h.getCompany)
 	return h, nil
 }

@@ -57,6 +57,8 @@ RUN sudo mkdir -p ${GOPATH} ${GOPATH}/bin \
         && go get github.com/derekparker/delve/cmd/dlv && cd src/github.com/derekparker/delve && make install \
     && sudo chown -R ${USER}:${GROUP} ${GOPATH} \
     && vim +PlugInstall +qa
+    && go get -u -d github.com/mattes/migrate/cli github.com/go-sql-driver/mysql \
+        && go build -tags 'mysql' -o ${GOPATH}/bin/migrate github.com/mattes/migrate/cli 
 
 # Configure project
 WORKDIR ${GOPATH}/src/${PROJECT_NS}

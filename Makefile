@@ -20,3 +20,6 @@ shell:
 
 status:
 	docker ps -a
+
+migrate:
+	docker exec -itd dev migrate -source file:///opt/code/src/github.com/arrisray/secql/migration -database mysql://admin:admin@tcp\(db:3306\)/secdb?multiStatements=true up

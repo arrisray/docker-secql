@@ -16,11 +16,12 @@ ARG VERSION=1.9.2
 ARG OS=linux
 ARG ARCH=amd64
 
-# # Envs
+# Envs
+ENV HOME /home/${USER}
 ENV GOPATH="${GOPATH}"
 ENV PATH="/usr/local/go/bin:${GOPATH}/bin:${PATH}"
 
-# Configure users
+# Configure user
 # - Add non-privileged user
 # - Set non-privileged user's user ID
 # - Set non-privileged user's groups (including sudo)
@@ -36,6 +37,8 @@ RUN id -u ${USER} || \
         && usermod --password $(openssl passwd -1 ${ROOT_PWD}) root \
         && echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     )
+USER ${USER}
+COPY config/.vimrc ${HOME}/.vimrc
 
 # Configure Go
 RUN sudo mkdir -p ${GOPATH} ${GOPATH}/bin \
@@ -43,6 +46,7 @@ RUN sudo mkdir -p ${GOPATH} ${GOPATH}/bin \
         ${GOPATH} \
         /usr/local \
         /tmp \
+    && cd /tmp \
     && wget -nc https://redirector.gvt1.com/edgedl/go/go${VERSION}.${OS}-${ARCH}.tar.gz \
         && tar -C /usr/local -xzf go${VERSION}.${OS}-${ARCH}.tar.gz \
     && wget -nc https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 \
@@ -51,17 +55,14 @@ RUN sudo mkdir -p ${GOPATH} ${GOPATH}/bin \
     && cd ${GOPATH} \
         && go get -u golang.org/x/tools/... \
         && go get github.com/derekparker/delve/cmd/dlv && cd src/github.com/derekparker/delve && make install \
-    && sudo chown -R ${USER}:${GROUP} ${GOPATH}
-
-# Configure env
-USER ${USER}
-ENV HOME /home/${USER}
+    && sudo chown -R ${USER}:${GROUP} ${GOPATH} \
+    && vim +PlugInstall +qa
 
 # Configure project
 WORKDIR ${GOPATH}/src/${PROJECT_NS}
 EXPOSE 2345 3000
 
 # Run
-ADD config/supervisord.conf /etc/supervisord.conf
+COPY config/supervisord.conf /etc/supervisord.conf
 CMD sudo /usr/bin/supervisord -c /etc/supervisord.conf
 

@@ -16,7 +16,7 @@ clean:
 	docker rm $(CONTAINER_IDS)
 
 shell:
-	docker exec -it secql_ide_1 /bin/bash
+	docker exec -it dev /bin/bash
 
 status:
 	docker ps -a

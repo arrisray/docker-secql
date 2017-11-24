@@ -14,5 +14,6 @@ func NewHandler() (*Handler, error) {
 	h := &Handler{Mux: chi.NewRouter()}
 	h.Get("/", h.getHome)
 	h.Get("/company/{id}", h.getCompany)
+	h.Get("/parse", h.parse)
 	return h, nil
 }
